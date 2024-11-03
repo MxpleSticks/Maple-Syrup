@@ -12,6 +12,7 @@ A collection of ASCII animations in C++ that you can easily copy and paste to ru
 
 ## Table of Contents
 - [Getting Started](#getting-started)
+- [Setting Up Visual Studio for C++](#setting-up-visual-studio-for-c)
 - [Usage](#usage)
 - [Available Animations](#available-animations)
 - [Customization](#customization)
@@ -21,76 +22,52 @@ A collection of ASCII animations in C++ that you can easily copy and paste to ru
 
 ## Getting Started
 
-Visit the [GitHub page]([https://github.com/MxpleSticks/Maple-Syrup]) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
+Visit the [GitHub page](https://github.com/MxpleSticks/Maple-Syrup) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
 
 No need for installation or setup—just copy and enjoy!
 
 ---
 
+## Setting Up Visual Studio for C++
+
+This guide will help you download Visual Studio, install the Desktop Development with C++ package, create a new C++ project, and add ASCII animation code.
+
+### Step 1: Download and Install Visual Studio
+1. Go to the [Visual Studio download page](https://visualstudio.microsoft.com/).
+2. Choose the **Community** version (free) and download it.
+3. Run the installer.
+
+### Step 2: Install Desktop Development with C++
+1. In the Visual Studio installer, under **Workloads**, select **Desktop development with C++**.
+2. Click **Install**. This will install the necessary C++ tools and libraries for building and running C++ programs.
+
+### Step 3: Create a New C++ Project
+1. Open Visual Studio.
+2. Go to **File > New > Project**.
+3. In the project templates, select **Console App** under **C++**.
+4. Name your project (e.g., `AsciiAnimationProject`) and click **Create**.
+
+### Step 4: Copy and Paste the Animation Code
+1. Visit the GitHub page for the ASCII animation you want to use (e.g., `spinning_donut.cpp`).
+2. Copy the code.
+3. In Visual Studio, open the `main.cpp` file that was generated with your project.
+4. Delete any existing code in `main.cpp` and paste in the animation code.
+
+### Step 5: Build and Run the Program
+1. In the top menu, click **Build > Build Solution** to compile your project.
+2. After it builds successfully, click **Debug > Start Without Debugging** (or press `Ctrl + F5`) to run the program.
+
+If you followed the steps correctly, your ASCII animation should display in the terminal window!
+
+---
+
 ## Usage
 
-1. **Browse** the animations on the GitHub page.
-2. **Copy** the code from any animation file (e.g., `spinning_donut.cpp`).
-3. **Paste** it into your project or main file, and run!
+### Example Animation: Spinning ASCII Donut
 
-### Example
-
-If you want to display a spinning ASCII donut animation:
-
-1. Copy the code from `spinning_donut.cpp`.
-2. Paste it into your project, and it’s ready to run.
-
-```cpp
-#include <cstdio>
-#include <cstring>
-#include <cmath>
-#include <unistd.h>
-
-int main() {
-    float A = 0, B = 0;
-    float i, j;
-    int k;
-    float z[1760];
-    char b[1760];
-    printf("\x1b[2J");
-    for (;;) {
-        memset(b, 32, 1760);
-        memset(z, 0, 7040);
-        for (j = 0; j < 6.28; j += 0.07) {
-            for (i = 0; i < 6.28; i += 0.02) {
-                float c = sin(i);
-                float d = cos(j);
-                float e = sin(A);
-                float f = sin(j);
-                float g = cos(A);
-                float h = d + 2;
-                float D = 1 / (c * h * e + f);
-                float l = cos(i);
-                float m = cos(B);
-                float n = sin(B);
-                float t = c * h * g - f * e;
-                int x = 40 + 30 * D * (l * h * m - t * n);
-                int y = 12 + 15 * D * (l * h * n + t * m);
-                int o = x + 80 * y;
-                int N = (int)(8 * ((f * e + c * g * d) * m - c * g * f - e * d - h));
-                
-                if (22 > y && y > 0 && x > 0 && 80 > x && D > z[o]) {
-                    z[o] = D;
-                    b[o] = ".,-~:;=!*#$@"[N > 0 ? N : 0];
-                }
-            }
-        }
-        printf("\x1b[H");
-        for (k = 0; k < 1761; k++) {
-            putchar(k % 80 ? b[k] : 10);
-        }
-        A += 0.00004;
-        B += 0.00002;
-        usleep(30000);
-    }
-    return 0;
-}
-```
+1. Copy the spinning donut code from `spinning_donut.cpp`.
+2. Paste it into `main.cpp`.
+3. Build and run as described above, and you’ll see the animation in action!
 
 ---
 
