@@ -1,0 +1,47 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <vector>
+#include <random>
+#include <chrono>
+#include <thread>
+
+int main() {
+    const int width = 80;
+    const int height = 24;
+    const char characters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    std::vector<int> columnHeights(width, 0);
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> charDist(0, sizeof(characters) - 2);
+
+    while (true) {
+        // Clear the screen
+        std::cout << "\x1b[2J\x1b[H";
+
+        // Update each column
+        for (int x = 0; x < width; ++x) {
+            // Randomize character for this column
+            char ch = characters[charDist(rng)];
+
+            // Display characters falling down each column
+            for (int y = 0; y < columnHeights[x]; ++y) {
+                std::cout << "\x1b[" << y << ";" << x << "H" << ch;
+            }
+
+            // Randomly increase column height to simulate falling effect
+            if (columnHeights[x] < height && rng() % 3 == 0) {
+                columnHeights[x]++;
+            }
+            // Randomly reset column height for more variety
+            if (columnHeights[x] == height && rng() % 20 == 0) {
+                columnHeights[x] = 0;
+            }
+        }
+
+        // Delay for animation speed control
+        std::this_thread::sleep_for(std::chrono::milliseconds(75));
+    }
+
+    return 0;
+}
