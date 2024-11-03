@@ -1,0 +1,43 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <chrono>
+#include <thread>
+
+int main() {
+    const int width = 80;
+    const int height = 24;
+    float time = 0;
+
+    while (true) {
+        // Clear the screen
+        std::cout << "\x1b[2J\x1b[H";
+
+        // Generate spiral tunnel effect
+        for (int y = -height / 2; y < height / 2; ++y) {
+            for (int x = -width / 2; x < width / 2; ++x) {
+                // Calculate distance and angle for each point
+                float dist = sqrt(x * x + y * y) * 0.1;
+                float angle = atan2(y, x) + time;
+
+                // Map distance and angle to ASCII characters
+                char ch = ".,-~:;=!*#$@"[(int)(fmod(dist + angle, 1.0) * 10)];
+
+                // Print character at the correct position
+                int screenX = x + width / 2;
+                int screenY = y + height / 2;
+                std::cout << "\x1b[" << screenY << ";" << screenX << "H" << ch;
+            }
+        }
+
+        // Increase time for next frame
+        time += 0.1;
+
+        // Delay to control animation speed
+        std::this_thread::sleep_for(std::chrono::milliseconds(001));
+    }
+
+    return 0;
+}
