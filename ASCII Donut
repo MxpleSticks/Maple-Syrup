@@ -1,4 +1,4 @@
-This ASCII animation is using C++. (copy below)
+This ASCII animation is using C++ and works on windows with no setup! (copy below)
 ---
 
 #include <iostream>
