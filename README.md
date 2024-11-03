@@ -1,5 +1,3 @@
-Here's the revised README with the spinning ASCII donut example:
-
 ---
 
 # ASCII Animation Showcase Library
