@@ -2,7 +2,7 @@
 
 # ASCII Animation Showcase Library
 
-A collection of ASCII animations in C++ that you can easily copy and paste to run in your own projects! Perfect for adding retro-styled animations to your terminal-based applications.
+A collection of ASCII animations in C++ that you can easily copy and paste to run in your own projects! Perfect for adding retro-styled animations to your terminal-based applications. All animations have been tested and work on Windows.
 
 ## Features
 - Multiple ASCII animations ready to showcase
@@ -22,7 +22,7 @@ A collection of ASCII animations in C++ that you can easily copy and paste to ru
 
 ## Getting Started
 
-Visit the [GitHub page](https://github.com/MxpleSticks/Maple-Syrup) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
+Visit the [GitHub page](https://github.com/username/ascii-animation-showcase) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
 
 No need for installation or setup—just copy and enjoy!
 
@@ -89,17 +89,6 @@ Each animation is designed to be easy to tweak. You can:
 - **Adjust Timing:** Change the frame delay to speed up or slow down the animation.
 - **Set Loop Count:** Define the number of repetitions.
 - **Edit Frames:** Modify frames directly in the file for custom effects.
-
----
-
-## Contributing
-
-Have an animation idea? Contributions are welcome:
-1. Fork this repository.
-2. Add a new animation file with clear comments.
-3. Submit a pull request!
-
-Please keep the animations simple and suitable for ASCII display.
 
 ---
 
