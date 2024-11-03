@@ -21,7 +21,7 @@ A collection of ASCII animations in C++ that you can easily copy and paste to ru
 
 ## Getting Started
 
-Visit the [GitHub page]((https://github.com/MxpleSticks/Maple-Syrup)) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
+Visit the [GitHub page]([https://github.com/MxpleSticks/Maple-Syrup]) to find individual animations in separate files. Just open a file, copy the code, and paste it into your C++ project.
 
 No need for installation or setup—just copy and enjoy!
 
