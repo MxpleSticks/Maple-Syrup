@@ -1,0 +1,160 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <chrono>
+#include <thread>
+#include <cmath>
+#include <iomanip>
+
+const int WIDTH = 80;
+const int HEIGHT = 24;
+const int NUM_STARS = 100;
+
+struct Star {
+    float x, y, z;
+
+    void reset() {
+        x = (rand() % WIDTH - WIDTH / 2) * 1.0f;
+        y = (rand() % HEIGHT - HEIGHT / 2) * 1.0f;
+        z = (float)(rand() % 10 + 1);
+    }
+
+    void update(float speed) {
+        z -= 0.2f * speed;
+        if (z <= 0) {
+            reset();
+        }
+    }
+
+    void draw(std::vector<std::vector<char>>& screen) {
+        int screenX = (int)(x / z) + WIDTH / 2;
+        int screenY = (int)(y / z) + HEIGHT / 2;
+
+        if (screenX >= 0 && screenX < WIDTH && screenY >= 0 && screenY < HEIGHT) {
+            char star_char;
+            if (z < 2) star_char = '#';
+            else if (z < 4) star_char = '*';
+            else if (z < 6) star_char = '+';
+            else if (z < 8) star_char = '·';
+            else star_char = '.';
+
+            screen[screenY][screenX] = star_char;
+
+            // Add trail effect for close stars
+            if (z < 3 && screenX > 0) {
+                screen[screenY][screenX - 1] = '·';
+            }
+        }
+    }
+};
+
+class SpaceDisplay {
+private:
+    std::vector<std::vector<char>> screen;
+    std::vector<Star> stars;
+    float speed;
+    float distance_traveled;
+    int frame_count;
+
+public:
+    SpaceDisplay() :
+        screen(HEIGHT, std::vector<char>(WIDTH)),
+        stars(NUM_STARS),
+        speed(1.0f),
+        distance_traveled(0.0f),
+        frame_count(0)
+    {
+        for (auto& star : stars) {
+            star.reset();
+        }
+    }
+
+    void update() {
+        // Clear screen
+        for (auto& row : screen) {
+            std::fill(row.begin(), row.end(), ' ');
+        }
+
+        // Update and draw stars
+        for (auto& star : stars) {
+            star.update(speed);
+            star.draw(screen);
+        }
+
+        // Update metrics
+        distance_traveled += speed * 0.1f;
+        frame_count++;
+
+        // Gradually increase speed
+        if (frame_count % 100 == 0) {
+            speed += 0.1f;
+            if (speed > 5.0f) speed = 1.0f;
+        }
+    }
+
+    void render() {
+        // Move cursor to top
+        std::cout << "\033[H";
+
+        // Draw top border with title
+        std::cout << "┌" << std::string(WIDTH - 2, '─') << "┐\n";
+
+        // Draw stars
+        for (const auto& row : screen) {
+            std::cout << "│";
+            for (char c : row) {
+                std::cout << c;
+            }
+            std::cout << "│\n";
+        }
+
+        // Draw bottom border
+        std::cout << "└" << std::string(WIDTH - 2, '─') << "┘\n";
+
+        // Draw status bar
+        drawStatusBar();
+    }
+
+    void drawStatusBar() {
+        // Speed indicator
+        std::cout << "Speed: [";
+        int speedBars = (int)(speed * 10);
+        std::cout << std::string(speedBars, '=') << std::string(50 - speedBars, ' ') << "] ";
+        std::cout << std::fixed << std::setprecision(1) << speed << "x\n";
+
+        // Distance traveled
+        std::cout << "Distance traveled: " << std::fixed << std::setprecision(1)
+            << distance_traveled << " light-years\n";
+
+        // Star density indicator
+        int visible_stars = 0;
+        for (const auto& row : screen) {
+            for (char c : row) {
+                if (c != ' ') visible_stars++;
+            }
+        }
+        std::cout << "Stars visible: " << visible_stars << "/" << NUM_STARS << "\n";
+    }
+};
+
+int main() {
+    // Seed random generator
+    srand(time(nullptr));
+
+    
+    std::cout << "\033[2J\033[?25l";
+
+    SpaceDisplay space;
+
+    
+    while (true) {
+        space.update();
+        space.render();
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    return 0;
+}
