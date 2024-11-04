@@ -1,0 +1,87 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <chrono>
+#include <thread>
+#include <string>
+#include <vector>
+
+const int WIDTH = 80;
+const int HEIGHT = 24;
+const int DEPTH = 16;
+const float PI = 3.14159f;
+const std::string GRADIENT = "   @@%%&&**";
+
+class Plasma3D {
+private:
+    std::vector<std::vector<std::vector<float>>> buffer;
+    float time;
+
+public:
+    Plasma3D() : buffer(HEIGHT, std::vector<std::vector<float>>(WIDTH, std::vector<float>(DEPTH))), time(0) {}
+
+    float plasma(float x, float y, float z) {
+        float v1 = sin(y / 4.0f + time * 2.0f);
+        float v2 = sin((x / 16.0f + time) + y / 8.0f);
+        float v3 = sin((y / 2.0f + time * 1.5f) + x / 32.0f);
+        float v4 = sin(sqrt(x * x + y * y) / 16.0f + time);
+        return (v1 + v2 + v3 + v4) / 4.0f;
+    }
+
+    void update() {
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                for (int z = 0; z < DEPTH; z++) {
+                    float nx = x - WIDTH / 2.0f;
+                    float ny = y - HEIGHT / 2.0f;
+                    float nz = z - DEPTH / 2.0f;
+                    buffer[y][x][z] = plasma(nx, ny, nz);
+                }
+            }
+        }
+        time += 0.05f;
+    }
+
+    char getChar(float value) {
+        float normalized = (value + 1.0f) / 2.0f;
+        int index = static_cast<int>(normalized * (GRADIENT.length() - 1));
+        return GRADIENT[index];
+    }
+
+    void render() {
+        std::cout << "\033[H";
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                float maxVal = -1.0f;
+                for (int z = 0; z < DEPTH; z++) {
+                    maxVal = std::max(maxVal, buffer[y][x][z]);
+                }
+                char c = getChar(maxVal);
+                if (c != ' ') {
+                    // Changed to bright white (255,255,255)
+                    std::cout << "\033[38;2;255;255;255m" << c;
+                }
+                else {
+                    std::cout << "\033[0m" << c;
+                }
+            }
+            std::cout << '\n';
+        }
+    }
+};
+
+int main() {
+    std::cout << "\033[2J\033[?25l\033[40m";
+
+    Plasma3D plasma;
+
+    while (true) {
+        plasma.update();
+        plasma.render();
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    return 0;
+}
