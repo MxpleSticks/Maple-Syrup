@@ -1,0 +1,45 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <thread>
+#include <chrono>
+
+const int width = 80;
+const int height = 24;
+
+void drawSphere(double angle) {
+    std::string buffer[height];
+
+    for (int y = 0; y < height; ++y) {
+        buffer[y] = std::string(width, ' ');
+    }
+
+    for (double phi = 0; phi < 1.5; phi += 0.1) {
+        for (double theta = 0; theta < 2; theta += 0.1) {
+            double x = 20 * sin(phi) * cos(theta + angle);
+            double y = 10 * sin(phi) * sin(theta + angle);
+            int screenX = static_cast<int>(width / 2 + x);
+            int screenY = static_cast<int>(height / 2 - y);
+            if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
+                buffer[screenY][screenX] = '*';
+            }
+        }
+    }
+
+    std::cout << "\x1b[H\x1b[2J";
+    for (const auto& line : buffer) {
+        std::cout << line << std::endl;
+    }
+}
+
+int main() {
+    double angle = 0.0;
+    while (true) {
+        drawSphere(angle);
+        angle += 0.1;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    return 0;
+}
