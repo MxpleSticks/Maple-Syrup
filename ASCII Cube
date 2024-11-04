@@ -1,0 +1,129 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <thread>
+#include <chrono>
+#include <vector>
+
+const int width = 80;   // Width of the console
+const int height = 24;  // Height of the console
+
+// Characters for shading
+const char shadingChars[] = " .:-=+*%@#"; // Gradation of shading from light to dark
+
+// Function to draw the cube
+void drawCube(double angleX, double angleY) {
+    std::vector<std::string> buffer(height, std::string(width, ' ')); // Create a blank buffer
+
+    // Cube vertices
+    double vertices[8][3] = {
+        {-1, -1, -1},
+        { 1, -1, -1},
+        { 1,  1, -1},
+        {-1,  1, -1},
+        {-1, -1,  1},
+        { 1, -1,  1},
+        { 1,  1,  1},
+        {-1,  1,  1},
+    };
+
+    // Indices to connect vertices with edges
+    int edges[12][2] = {
+        {0, 1}, {1, 2}, {2, 3}, {3, 0}, // Back face
+        {4, 5}, {5, 6}, {6, 7}, {7, 4}, // Front face
+        {0, 4}, {1, 5}, {2, 6}, {3, 7}  // Connecting edges
+    };
+
+    // Rotation matrices
+    double cosX = cos(angleX);
+    double sinX = sin(angleX);
+    double cosY = cos(angleY);
+    double sinY = sin(angleY);
+
+    // Project and draw vertices
+    for (int i = 0; i < 8; ++i) {
+        // Rotate around the X-axis
+        double y = vertices[i][1] * cosX - vertices[i][2] * sinX;
+        double z = vertices[i][1] * sinX + vertices[i][2] * cosX;
+        double x = vertices[i][0];
+
+        // Rotate around the Y-axis
+        vertices[i][0] = x * cosY + z * sinY;
+        vertices[i][1] = y;
+        vertices[i][2] = -x * sinY + z * cosY;
+
+        // Projection
+        int screenX = static_cast<int>((vertices[i][0] + 2) * (width / 4));
+        int screenY = static_cast<int>((vertices[i][1] + 2) * (height / 4));
+
+        // Calculate shading based on the Z value (depth)
+        int shadeIndex = static_cast<int>((vertices[i][2] + 1) * 4); // Scale to fit array
+        shadeIndex = std::max(0, std::min(shadeIndex, static_cast<int>(sizeof(shadingChars) - 2))); // Clamp between 0 and size
+
+        // Draw vertex shading if in bounds
+        if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
+            buffer[screenY][screenX] = shadingChars[shadeIndex]; // Use shading character
+        }
+    }
+
+    // Draw edges
+    for (const auto& edge : edges) {
+        int x1 = static_cast<int>((vertices[edge[0]][0] + 2) * (width / 4));
+        int y1 = static_cast<int>((vertices[edge[0]][1] + 2) * (height / 4));
+        int x2 = static_cast<int>((vertices[edge[1]][0] + 2) * (width / 4));
+        int y2 = static_cast<int>((vertices[edge[1]][1] + 2) * (height / 4));
+
+        // Draw line using Bresenham's line algorithm
+        int dx = abs(x2 - x1);
+        int dy = abs(y2 - y1);
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+        int err = dx - dy;
+
+        while (true) {
+            if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height) {
+                // Calculate shading based on the average depth of the connected vertices
+                double avgZ = (vertices[edge[0]][2] + vertices[edge[1]][2]) / 2;
+                int shadeIndex = static_cast<int>((avgZ + 1) * 4); // Scale to fit array
+                shadeIndex = std::max(0, std::min(shadeIndex, static_cast<int>(sizeof(shadingChars) - 2))); // Clamp between 0 and size
+
+                buffer[y1][x1] = shadingChars[shadeIndex]; // Draw the edge with shading
+            }
+            if (x1 == x2 && y1 == y2) break;
+            int err2 = err * 2;
+            if (err2 > -dy) {
+                err -= dy;
+                x1 += sx;
+            }
+            if (err2 < dx) {
+                err += dx;
+                y1 += sy;
+            }
+        }
+    }
+
+    // Clear the console
+    std::cout << "\x1b[H\x1b[2J";
+
+    // Render the buffer
+    for (const auto& line : buffer) {
+        std::cout << line << std::endl;
+    }
+}
+
+int main() {
+    double angleX = 0;
+    double angleY = 0;
+
+    while (true) {
+        drawCube(angleX, angleY);
+        angleX += 0.05; // Increment rotation around X
+        angleY += 0.1;  // Increment rotation around Y
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(035)); // Control speed of animation
+    }
+
+    return 0;
+}
