@@ -1,0 +1,98 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <chrono>
+#include <thread>
+#include <vector>
+#include <string>
+#include <sstream>
+
+#define WIDTH 60
+#define HEIGHT 30
+#define PI 3.14159265359
+
+class ASCIISwirl {
+private:
+    std::vector<std::vector<char>> buffer;
+    std::string outputBuffer;
+    const std::string chars = " .:-=+*#%@";
+    double time = 0.0;
+
+    void initializeOutputBuffer() {
+        // Pre-calculate buffer size including newlines
+        outputBuffer.reserve(HEIGHT * (WIDTH + 1));
+    }
+
+    void clearBuffer() {
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                buffer[y][x] = ' ';
+            }
+        }
+    }
+
+    double swirl(double x, double y, double t) {
+        double dx = x - WIDTH / 2;
+        double dy = y - HEIGHT / 2;
+        double dist = std::sqrt(dx * dx + dy * dy);
+        double angle = std::atan2(dy, dx);
+        // Smoothed animation by reducing frequency and amplitude
+        return std::sin(2 * angle + dist / 4 + t) + std::sin(dist / 5 - t * 0.8);
+    }
+
+public:
+    ASCIISwirl() : buffer(HEIGHT, std::vector<char>(WIDTH)) {
+        clearBuffer();
+        initializeOutputBuffer();
+        // Print initial ANSI escape sequences
+        std::cout << "\033[2J\033[?25l"; // Clear screen and hide cursor
+        std::cout.sync_with_stdio(false); // Disable synchronization with C stdio
+    }
+
+    ~ASCIISwirl() {
+        std::cout << "\033[?25h"; // Show cursor before exit
+    }
+
+    void update() {
+        outputBuffer.clear();
+        outputBuffer = "\033[H"; // Move cursor to home position
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                double value = swirl(x, y, time);
+                int charIndex = static_cast<int>((value + 2) * (chars.length() - 1) / 4);
+                charIndex = std::max(0, std::min(static_cast<int>(chars.length() - 1), charIndex));
+                outputBuffer += chars[charIndex];
+            }
+            outputBuffer += '\n';
+        }
+
+        // Slower time increment for smoother animation
+        time += 0.05;
+    }
+
+    void render() {
+        std::cout << outputBuffer << std::flush;
+    }
+};
+
+int main() {
+    ASCIISwirl swirl;
+
+    using clock = std::chrono::steady_clock;
+    auto next_frame = clock::now();
+    const std::chrono::milliseconds frame_duration(33); // ~30 FPS
+
+    while (true) {
+        swirl.update();
+        swirl.render();
+
+        // Precise frame timing
+        next_frame += frame_duration;
+        std::this_thread::sleep_until(next_frame);
+    }
+
+    return 0;
+}
