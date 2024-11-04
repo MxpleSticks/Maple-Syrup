@@ -12,7 +12,7 @@ const int WIDTH = 80;
 const int HEIGHT = 24;
 const int DEPTH = 16;
 const float PI = 3.14159f;
-const std::string GRADIENT = "   @@%%&&**";
+const std::string GRADIENT = "   #+%@&!**";
 
 class Plasma3D {
 private:
