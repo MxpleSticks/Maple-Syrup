@@ -1,0 +1,101 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <complex>
+#include <cmath>
+#include <chrono>
+#include <thread>
+#include <iomanip> 
+
+
+const int width = 80;
+const int height = 24;
+
+
+char getShadingCharacter(double magnitude) {
+    const std::string shades = " .:-=+*#%@";
+    int index = static_cast<int>(magnitude * 10) % shades.size();
+    return shades[index];
+}
+
+
+void displayHeader() {
+    std::cout << "Fractal Formula: (|real(z)^2|^(0.5 + 2i) + i * |imag(z)^2|^(0.5 + 2i)) ^ 2 + c\n";
+    std::cout << std::string(80, '=') << "\n";
+}
+
+
+void generateFractal(double timeOffset, double zoom, double blendFactor) {
+    std::complex<double> c(0.355, 0.355);  // Constant c for the fractal
+
+    for (int y = 0; y < height - 3; ++y) {  // Adjust height to fit header and footer
+        for (int x = 0; x < width; ++x) {
+          
+            double effectiveZoom = zoom * (1.0 - blendFactor) + 0.05 * blendFactor;
+
+           
+            std::complex<double> z(
+                (x - width / 2.0) * effectiveZoom,
+                (y - (height - 3) / 2.0) * effectiveZoom);
+
+            
+            z *= std::polar(1.0, timeOffset);
+
+            // Apply the formula: (|real(z)^2|^(0.5 + 2i) + i * |imag(z)^2|^(0.5 + 2i))^2 + c
+            z = std::pow(std::abs(std::real(z) * std::real(z)), std::complex<double>(0.5, 2))
+                + std::complex<double>(0, 1) * std::pow(std::abs(std::imag(z) * std::imag(z)), std::complex<double>(0.5, 2));
+            z = z * z + c;
+
+            
+            char shade = getShadingCharacter(std::abs(z));
+            std::cout << shade;
+        }
+        std::cout << '\n';
+    }
+}
+
+int main() {
+    double timeOffset = 0.0;
+    double zoom = 0.05;  
+    const double zoomIncrement = 0.98;  
+    const double minZoom = 0.0005;      
+    const int transitionFrames = 20;     
+    int frameCount = 0;
+    int dotCount = 0;                    
+    double overallZoom = 0.05;           
+
+    while (true) {
+        std::cout << "\x1b[H\x1b[2J"; // Clear the console
+        displayHeader();
+
+        
+        double blendFactor = (zoom < minZoom) ? static_cast<double>(frameCount) / transitionFrames : 0.0;
+        generateFractal(timeOffset, zoom, blendFactor);
+
+        
+        std::cout << "\nZooming deeper" << std::string(dotCount % 4, '.') << "\n"; // Animated dots
+
+        
+        if (zoom >= minZoom) {
+            zoom *= zoomIncrement; 
+            overallZoom *= zoomIncrement; 
+        }
+        else {
+            
+            frameCount++;
+            if (frameCount > transitionFrames) {
+                // Increase overall zoom slightly for the next loop without showing it as a zoom out
+                overallZoom *= 1.15; // Increase zoom for next round
+                zoom = 0.05; // Reset zoom for new loop
+                frameCount = 0;
+            }
+        }
+
+       
+        dotCount++;
+        timeOffset += 0.1; // Increment to animate over time
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    return 0;
+}
