@@ -1,0 +1,96 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <cmath>
+#include <vector>
+
+#define WIDTH 80
+#define HEIGHT 24
+#define PI 3.14159265359
+
+class ASCIIAnimation {
+private:
+    std::vector<std::vector<char>> buffer;
+    float time = 0.0f;
+    const char gradient[11] = " .:-=+*#%@";
+
+    void clearBuffer() {
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                buffer[y][x] = ' ';
+            }
+        }
+    }
+
+    int mapToGradient(float value) {
+        // Map value from [-1,1] to [0,9]
+        int index = static_cast<int>((value + 1.0f) * 4.5f);
+        index = std::max(0, std::min(9, index));
+        return index;
+    }
+
+    void renderWave() {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                float xNorm = x / static_cast<float>(WIDTH) * 4.0f;
+                float yNorm = y / static_cast<float>(HEIGHT) * 4.0f;
+
+                // Create complex wave pattern
+                float value = 0.5f * std::sin(xNorm * 2.0f + time) *
+                    std::cos(yNorm * 2.0f + time * 0.5f) +
+                    0.5f * std::sin(std::sqrt((xNorm - 2) * (xNorm - 2) +
+                        (yNorm - 2) * (yNorm - 2)) * 3.0f - time * 2.0f);
+
+                int gradientIndex = mapToGradient(value);
+                buffer[y][x] = gradient[gradientIndex];
+            }
+        }
+    }
+
+public:
+    ASCIIAnimation() : buffer(HEIGHT, std::vector<char>(WIDTH)) {
+        clearBuffer();
+    }
+
+    void update() {
+        time += 0.1f;
+        clearBuffer();
+        renderWave();
+    }
+
+    void draw() {
+        // Move cursor to top-left corner
+        std::cout << "\033[H";
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                std::cout << buffer[y][x];
+            }
+            std::cout << '\n';
+        }
+    }
+};
+
+int main() {
+    // Clear screen and hide cursor
+    std::cout << "\033[2J\033[?25l";
+
+    ASCIIAnimation animation;
+
+    // Main animation loop
+    while (true) {
+        animation.update();
+        animation.draw();
+
+        // Control animation speed
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    // Show cursor (this won't be reached in this example)
+    std::cout << "\033[?25h";
+    return 0;
+}
