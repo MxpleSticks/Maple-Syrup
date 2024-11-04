@@ -74,10 +74,10 @@ If you followed the steps correctly, your ASCII animation should display in the 
 ## Available Animations
 
 - **Spinning Donut:** A mesmerizing rotating 3D donut made with ASCII characters
-- **Waving Flag:** A flag rippling in the wind
-- **Running Stick Figure:** A stick figure running across the screen
-- **Typing Text:** Simulates a typing effect for text
-- **Fireworks Display:** A looping fireworks animation
+- **Cube:** A fun little spinning cube
+- **Fractal Formula:** A formula calculated to ascii form
+- **Rain:** Simulates a raining effect for text
+- **Spiral:** A looping spiral animation
 
 Check out each animation on the GitHub page and simply copy the one you like!
 
