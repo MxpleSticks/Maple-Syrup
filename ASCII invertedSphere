@@ -1,0 +1,68 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <cmath>
+#include <thread>
+#include <chrono>
+#include <corecrt_math_defines.h>
+
+const int width = 80;   // Width of the console
+const int height = 24;  // Height of the console
+
+// Function to draw the 3D spinning sphere
+void drawSphere(double angle) {
+    std::string buffer[height];
+
+    // Clear the buffer
+    for (int i = 0; i < height; ++i) {
+        buffer[i] = std::string(width, ' ');
+    }
+
+    // Draw the sphere
+    for (double phi = 0; phi < M_PI; phi += 0.1) {
+        for (double theta = 0; theta < 2 * M_PI; theta += 0.1) {
+            // Convert spherical coordinates to Cartesian
+            double x = 10 * sin(phi) * cos(theta);
+            double y = 10 * sin(phi) * sin(theta);
+            double z = 10 * cos(phi);
+
+            // Apply rotation around the Y-axis
+            double rotatedX = x * cos(angle) - z * sin(angle);
+            double rotatedZ = x * sin(angle) + z * cos(angle);
+
+            // Perspective projection
+            double perspective = 10.0 / (10.0 + rotatedZ);
+            int screenX = static_cast<int>(width / 2 + rotatedX * perspective);
+            int screenY = static_cast<int>(height / 2 - y * perspective);
+
+            // Add shading based on the position in the sphere
+            char ch = ' ';
+            if (phi < M_PI / 6) ch = '@'; // Top of the sphere
+            else if (phi < M_PI / 3) ch = '#'; // Upper middle
+            else if (phi < M_PI / 2) ch = '*'; // Lower middle
+            else ch = '.'; // Bottom of the sphere
+
+            // Place character in buffer if within bounds
+            if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
+                buffer[screenY][screenX] = ch;
+            }
+        }
+    }
+
+    // Clear the console and draw the buffer
+    std::cout << "\x1b[H\x1b[2J"; // ANSI escape codes to clear the screen
+    for (const auto& line : buffer) {
+        std::cout << line << std::endl;
+    }
+}
+
+int main() {
+    double angle = 0.0;
+    while (true) {
+        drawSphere(angle);
+        angle += 0.1; // Adjust rotation speed
+        std::this_thread::sleep_for(std::chrono::milliseconds(25)); // Control animation speed
+    }
+    return 0;
+}
