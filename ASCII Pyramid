@@ -1,0 +1,128 @@
+This ASCII animation is using C++. (copy below)
+---
+
+#include <iostream>
+#include <chrono>
+#include <thread>
+#include <cmath>
+#include <string>
+#include <vector>
+
+const double PI = 3.14159265358979323846;
+
+// Define Point struct at the global scope
+struct Point {
+    int x, y;
+};
+
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+// Function to draw a line between two points
+void drawLine(std::vector<std::string>& frame, Point p1, Point p2, char c) {
+    int dx = std::abs(p2.x - p1.x);
+    int dy = std::abs(p2.y - p1.y);
+    int sx = p1.x < p2.x ? 1 : -1;
+    int sy = p1.y < p2.y ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2;
+
+    int x = p1.x;
+    int y = p1.y;
+
+    while (true) {
+        if (y >= 0 && y < frame.size() && x >= 0 && x < frame[0].size()) {
+            frame[y][x] = c;
+        }
+
+        if (x == p2.x && y == p2.y) break;
+
+        int e2 = err;
+        if (e2 > -dx) {
+            err -= dy;
+            x += sx;
+        }
+        if (e2 < dy) {
+            err += dx;
+            y += sy;
+        }
+    }
+}
+
+std::vector<std::string> createPyramidFrame(double angle, int size) {
+    std::vector<std::string> frame(size * 2, std::string(size * 4, ' '));
+
+    // Center point coordinates
+    int centerX = size * 2;
+    int centerY = size;
+
+    // Base square corners (clockwise from front-left)
+    Point basePoints[4] = {
+        {-size, size},    // front-left
+        {size, size},     // front-right
+        {size, -size},    // back-right
+        {-size, -size}    // back-left
+    };
+
+    // Rotate points
+    Point rotatedBase[4];
+    for (int i = 0; i < 4; i++) {
+        double x = basePoints[i].x;
+        double y = basePoints[i].y;
+        // Apply rotation
+        double rotX = x * std::cos(angle) - y * std::sin(angle);
+        double rotY = x * std::sin(angle) + y * std::cos(angle);
+        // Add perspective by scaling Z
+        double scale = (rotY + size * 2) / (size * 4.0) + 0.5;
+        rotatedBase[i].x = centerX + static_cast<int>(rotX * scale);
+        rotatedBase[i].y = centerY + static_cast<int>(rotY * 0.5);
+    }
+
+    // Top point of pyramid
+    Point top = { centerX, centerY - size };
+
+    // Draw edges
+    for (int i = 0; i < 4; i++) {
+        // Draw base edges
+        int nextI = (i + 1) % 4;
+        drawLine(frame, rotatedBase[i], rotatedBase[nextI], '#');
+        // Draw edges to top
+        drawLine(frame, rotatedBase[i], top, '#');
+    }
+
+    return frame;
+}
+
+int main() {
+    const int pyramidSize = 10;
+    const int frames = 120;
+    const int frameDelay = 10; // milliseconds
+
+    while (true) {
+        for (int frame = 0; frame < frames; frame++) {
+            clearScreen();
+
+            // Calculate the current rotation angle
+            double angle = (frame * 2 * PI) / frames;
+
+            // Create and display the current frame
+            auto pyramidFrame = createPyramidFrame(angle, pyramidSize);
+
+            // Add some spacing at the top
+            std::cout << "\n\n";
+
+            // Display the frame
+            for (const auto& line : pyramidFrame) {
+                std::cout << line << '\n';
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(frameDelay));
+        }
+    }
+
+    return 0;
+}
