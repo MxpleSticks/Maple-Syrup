@@ -1,6 +1,6 @@
 ---
 
-# ASCII Animation Showcase Library
+# ASCII 3d Animation Library
 
 A collection of ASCII animations in C++ that you can easily copy and paste to run in your own projects! Perfect for your terminal-based applications. All animations have been tested and work on Windows.
 
