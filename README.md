@@ -2,7 +2,7 @@
 
 # ASCII Animation Showcase Library
 
-A collection of ASCII animations in C++ that you can easily copy and paste to run in your own projects! Perfect for adding retro-styled animations to your terminal-based applications. All animations have been tested and work on Windows.
+A collection of ASCII animations in C++ that you can easily copy and paste to run in your own projects! Perfect for your terminal-based applications. All animations have been tested and work on Windows.
 
 ## Features
 - Multiple ASCII animations ready to showcase
