@@ -1,0 +1,37 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+void clearScreen() {
+    cout << "\033[2J\033[H";
+}
+
+void bouncingBall() {
+    int height = 5;
+    int direction = 1;
+    int pos = 0;
+
+    while (true) {
+        clearScreen();
+        for (int i = 0; i < height; i++) {
+            if (i == pos)
+                cout << "  O  \n";
+            else
+                cout << "     \n";
+        }
+        pos += direction;
+
+        if (pos == height - 1 || pos == 0) {
+            direction = -direction;
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(200));
+    }
+}
+
+int main() {
+    bouncingBall();
+    return 0;
+}
