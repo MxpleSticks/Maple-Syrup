@@ -1,0 +1,26 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+void clearScreen() {
+    cout << "\033[2J\033[H";
+}
+
+void spinningLine() {
+    const string frames[] = { "|", "/", "-", "\\" };
+    int frame = 0;
+
+    while (true) {
+        clearScreen();
+        cout << frames[frame] << endl;
+        frame = (frame + 1) % 4;
+        this_thread::sleep_for(chrono::milliseconds(150));
+    }
+}
+
+int main() {
+    spinningLine();
+    return 0;
+}
