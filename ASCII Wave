@@ -1,0 +1,38 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <cmath>
+
+using namespace std;
+
+void clearScreen() {
+    cout << "\033[2J\033[H";
+}
+
+void waveAnimation() {
+    const int width = 40;
+    const int height = 10;
+    int t = 0;
+
+    while (true) {
+        clearScreen();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (y == static_cast<int>(5 + 4 * sin((x + t) * 0.3))) {
+                    cout << "*";
+                }
+                else {
+                    cout << " ";
+                }
+            }
+            cout << endl;
+        }
+        t++;
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+}
+
+int main() {
+    waveAnimation();
+    return 0;
+}
